@@ -6,17 +6,11 @@ use rocket::{
 };
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
-use backend::weather::{self, example, Record};
+use backend::weather::{example, Record};
 
 
 #[get("/")]
 fn index() -> &'static str {
-    let r = weather::test();
-    println!("{}", r);
-    let content = weather::read_files();
-    for f in content {
-        println!("{}", f.display());
-    }
     "Hello, world!"
 }
 

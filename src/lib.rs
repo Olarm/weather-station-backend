@@ -22,20 +22,7 @@ pub mod weather {
     }
 
 
-    pub fn test() -> String {
-        return "jippi".to_string();
-    }
-
-    pub fn read_single() {
-        let contents = fs::read_to_string("./raw/2024/2024-06/2024-06-07.txt")
-            .expect("Should have been able to read the file");
-    }
-
     pub fn example() -> Result<Vec<Record>, Box<dyn Error>> {
-        let mut reader = csv::ReaderBuilder::new()
-            .has_headers(false)
-            .from_path("./raw/2024/2024-06/2024-06-07.txt");
-
         let headers = csv::StringRecord::from(vec![
             "timestamp", 
             "interval", 
