@@ -1,8 +1,10 @@
 pub mod weather {
     use std::fs;
     use std::error::Error;
+    use std::path::PathBuf;
     use csv::Reader;
     use serde::{Deserialize, Serialize};
+    use chrono::{Datelike, Duration, Utc};
 
 
     #[derive(Debug, Deserialize, Serialize)]
@@ -21,6 +23,28 @@ pub mod weather {
         pub rain_year: f64
     }
 
+    fn generate_paths() -> Vec<String> {
+        let mut paths = Vec::new();
+        let now = Utc::now();
+
+        for i in 0..30 {
+            let date = now - Duration::days(i);
+            let path = format!(
+                "./raw/{}/{:04}-{:02}/{:04}-{:02}-{:02}.txt",
+                date.year(),
+                date.year(),
+                date.month(),
+                date.year(),
+                date.month(),
+                date.day()
+            );
+            if fs::metadata(&path).is_ok() {
+                paths.push(path);
+            }
+        }
+
+        paths
+    }
 
     pub fn example() -> Result<Vec<Record>, Box<dyn Error>> {
         let headers = csv::StringRecord::from(vec![
@@ -39,13 +63,19 @@ pub mod weather {
         ]);
 
         let mut list: Vec<Record> = Vec::new();
-
-        let mut rdr = Reader::from_path("./raw/2024/2024-06/2024-06-07.txt")?;
-        for result in rdr.records() {
-            match result.unwrap().deserialize(Some(&headers)) {
-                Ok(record) => list.push(record),
-                Err(_) => continue,
-            };
+        let paths = generate_paths();
+        //let path: PathBuf = "./raw/2023/2023-06/2023-06-07.txt".into();
+        //let mut rdr = Reader::from_path("./raw/2023/2023-06/2023-06-07.txt")?;
+        for path in paths {
+            println!("{}", path);
+            let mut rdr = Reader::from_path(path)?;
+            for result in rdr.records() {
+                match result.unwrap().deserialize(Some(&headers)) {
+                    //Ok(record) => list.push(record),
+                    Ok(record) => list.insert(0, record),
+                    Err(_) => continue,
+                };
+            }
         }
         Ok(list)
     }
